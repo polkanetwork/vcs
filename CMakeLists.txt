@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(nvcs VERSION 1.0.0 LANGUAGES CXX)
+project(nvcs VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -95,6 +95,7 @@ set(NVCS_CLI_SOURCES
     cli/commands/clone.cpp
     cli/commands/config_cmd.cpp
     cli/commands/cat_object.cpp
+    cli/commands/version.cpp
 )
 
 add_executable(nvcs ${NVCS_CLI_SOURCES})
@@ -103,6 +104,7 @@ target_include_directories(nvcs PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/third_party
 )
+target_compile_definitions(nvcs PRIVATE NVCS_VERSION="${PROJECT_VERSION}")
 target_compile_options(nvcs PRIVATE -Wno-deprecated-declarations)
 
 # ── Server ───────────────────────────────────────────────────────────────────

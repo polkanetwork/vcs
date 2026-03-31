@@ -23,6 +23,7 @@ int cmd_pull(const std::vector<std::string>& args);
 int cmd_clone(const std::vector<std::string>& args);
 int cmd_config(const std::vector<std::string>& args);
 int cmd_cat_object(const std::vector<std::string>& args);
+int cmd_version(const std::vector<std::string>& args);
 
 static void print_usage() {
     std::cerr <<
@@ -48,7 +49,8 @@ static void print_usage() {
         "  pull <remote> <branch>        Pull from remote\n"
         "\nOther:\n"
         "  config [--global] key value   Get/set config\n"
-        "  cat-object <hash>             Print object contents\n";
+        "  cat-object <hash>             Print object contents\n"
+        "  version                       Show nvcs and repo version\n";
 }
 
 int main(int argc, char** argv) {
@@ -76,6 +78,7 @@ int main(int argc, char** argv) {
         {"clone",      cmd_clone},
         {"config",     cmd_config},
         {"cat-object", cmd_cat_object},
+        {"version",    cmd_version},
     };
 
     auto it = commands.find(cmd);
