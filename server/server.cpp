@@ -1,4 +1,5 @@
 #include "server.hpp"
+#include <nvcs/server_utils.hpp>
 #include <filesystem>
 #include <iostream>
 #include <stdexcept>
@@ -9,13 +10,8 @@ namespace fs = std::filesystem;
 namespace nvcs::server {
 
 static fs::path repo_path(const std::string& name, const std::string& repo_dir) {
-    if (name.empty())
-        throw std::invalid_argument("invalid repo name");
-    for (char c : name) {
-        unsigned char uc = static_cast<unsigned char>(c);
-        if (!std::isalnum(uc) && c != '-' && c != '_' && c != '.')
-            throw std::invalid_argument("invalid repo name: " + name);
-    }
+    if (!nvcs::server_utils::validate_repo_name(name))
+        throw std::invalid_argument("invalid repo name: " + name);
     return fs::path(repo_dir) / name;
 }
 
@@ -30,11 +26,8 @@ void setup_routes(httplib::Server& svr, const std::string& repo_dir, std::mutex&
 
     svr.Get("/repos", [repo_dir](const httplib::Request&, httplib::Response& res) {
         json repos = json::array();
-        if (fs::exists(repo_dir)) {
-            for (auto& entry : fs::directory_iterator(repo_dir)) {
-                if (entry.is_directory() && fs::exists(entry.path() / ".nvcs"))
-                    repos.push_back(entry.path().filename().string());
-            }
+        for (auto& name : nvcs::server_utils::list_repositories(repo_dir)) {
+            repos.push_back(name);
         }
         json resp;
         resp["repos"] = repos;

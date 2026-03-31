@@ -1,0 +1,8 @@
+[package]
+name = "server_utils"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "server_utils"
+crate-type = ["staticlib"]

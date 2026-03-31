@@ -90,8 +90,27 @@ target_compile_options(nvcs_core PRIVATE
 )
 
 # ── Server support library ───────────────────────────────────────────────────
-add_library(nvcs_server STATIC server/server.cpp)
-target_link_libraries(nvcs_server PUBLIC nvcs_core)
+set(RUST_SERVER_UTILS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/rust/server_utils)
+set(RUST_SERVER_UTILS_LIB ${RUST_SERVER_UTILS_DIR}/target/release/libserver_utils.a)
+
+add_custom_command(
+    OUTPUT ${RUST_SERVER_UTILS_LIB}
+    COMMAND ${CARGO} build --release
+    WORKING_DIRECTORY ${RUST_SERVER_UTILS_DIR}
+    COMMENT "Building Rust server_utils library"
+    VERBATIM
+)
+
+add_custom_target(server_utils_rust ALL DEPENDS ${RUST_SERVER_UTILS_LIB})
+
+add_library(server_utils STATIC IMPORTED GLOBAL)
+set_target_properties(server_utils PROPERTIES
+    IMPORTED_LOCATION ${RUST_SERVER_UTILS_LIB}
+)
+add_dependencies(server_utils server_utils_rust)
+
+add_library(nvcs_server STATIC server/server.cpp server/server_utils.cpp)
+target_link_libraries(nvcs_server PUBLIC nvcs_core server_utils)
 target_include_directories(nvcs_server
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
