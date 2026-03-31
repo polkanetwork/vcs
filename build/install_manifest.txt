@@ -1,2 +1,0 @@
-/Users/allexander/Desktop/nvcs/vcs/dist/bin/nvcs
-/Users/allexander/Desktop/nvcs/vcs/dist/bin/nvcs-server
