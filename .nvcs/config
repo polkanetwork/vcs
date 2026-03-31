@@ -1,0 +1,5 @@
+[core]
+    defaultbranch = main
+[user]
+    name = Unknown User
+    email = user@example.com
