@@ -1,2 +1,0 @@
-/usr/bin/ar qc libnvcs_server.a CMakeFiles/nvcs_server.dir/server/server.cpp.o CMakeFiles/nvcs_server.dir/server/server_utils.cpp.o
-/usr/bin/ranlib libnvcs_server.a
