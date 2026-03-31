@@ -1,4 +1,5 @@
 #include "nvcs/core/repository.hpp"
+#include "nvcs/version_system.hpp"
 #include <iostream>
 #include <filesystem>
 
@@ -9,6 +10,12 @@
 int cmd_version(const std::vector<std::string>& args) {
     namespace fs = std::filesystem;
     std::cout << "nvcs version " << NVCS_VERSION << "\n";
+    try {
+        std::cout << "version module valid: " << (nvcs::version::valid(NVCS_VERSION) ? "yes" : "no") << "\n";
+        std::cout << "normalized version: " << nvcs::version::normalize(NVCS_VERSION) << "\n";
+    } catch (const std::exception& e) {
+        std::cout << "version module error: " << e.what() << "\n";
+    }
 
     if (args.empty()) {
         try {

@@ -1,0 +1,13 @@
+/Users/allexander/Desktop/nvcs/vcs/build/CMakeFiles/version_system_rust.dir
+/Users/allexander/Desktop/nvcs/vcs/build/CMakeFiles/nvcs_core.dir
+/Users/allexander/Desktop/nvcs/vcs/build/CMakeFiles/nvcs_server.dir
+/Users/allexander/Desktop/nvcs/vcs/build/CMakeFiles/nvcs.dir
+/Users/allexander/Desktop/nvcs/vcs/build/CMakeFiles/nvcs-server.dir
+/Users/allexander/Desktop/nvcs/vcs/build/CMakeFiles/nvcs-server-gui.dir
+/Users/allexander/Desktop/nvcs/vcs/build/CMakeFiles/nvcs-client-gui.dir
+/Users/allexander/Desktop/nvcs/vcs/build/CMakeFiles/edit_cache.dir
+/Users/allexander/Desktop/nvcs/vcs/build/CMakeFiles/rebuild_cache.dir
+/Users/allexander/Desktop/nvcs/vcs/build/CMakeFiles/list_install_components.dir
+/Users/allexander/Desktop/nvcs/vcs/build/CMakeFiles/install.dir
+/Users/allexander/Desktop/nvcs/vcs/build/CMakeFiles/install/local.dir
+/Users/allexander/Desktop/nvcs/vcs/build/CMakeFiles/install/strip.dir

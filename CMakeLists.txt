@@ -18,6 +18,7 @@ find_package(OpenSSL REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(Threads REQUIRED)
 find_package(OpenGL REQUIRED)
+find_program(CARGO cargo REQUIRED)
 find_package(glfw3 REQUIRED)
 
 if(TARGET OpenGL::GL)
@@ -31,6 +32,25 @@ else()
 endif()
 
 # ── Core library ─────────────────────────────────────────────────────────────
+set(RUST_VERSION_SYSTEM_DIR ${CMAKE_CURRENT_SOURCE_DIR}/rust/version_system)
+set(RUST_VERSION_SYSTEM_LIB ${RUST_VERSION_SYSTEM_DIR}/target/release/libversion_system.a)
+
+add_custom_command(
+    OUTPUT ${RUST_VERSION_SYSTEM_LIB}
+    COMMAND ${CARGO} build --release
+    WORKING_DIRECTORY ${RUST_VERSION_SYSTEM_DIR}
+    COMMENT "Building Rust version_system library"
+    VERBATIM
+)
+
+add_custom_target(version_system_rust ALL DEPENDS ${RUST_VERSION_SYSTEM_LIB})
+
+add_library(version_system STATIC IMPORTED GLOBAL)
+set_target_properties(version_system PROPERTIES
+    IMPORTED_LOCATION ${RUST_VERSION_SYSTEM_LIB}
+)
+add_dependencies(version_system version_system_rust)
+
 set(NVCS_CORE_SOURCES
     src/util/hash.cpp
     src/util/compress.cpp
@@ -44,6 +64,7 @@ set(NVCS_CORE_SOURCES
     src/core/repository.cpp
     src/net/protocol.cpp
     src/net/transport.cpp
+    src/version_system.cpp
 )
 
 add_library(nvcs_core STATIC ${NVCS_CORE_SOURCES})
@@ -60,6 +81,7 @@ target_link_libraries(nvcs_core
         OpenSSL::Crypto
         ZLIB::ZLIB
         Threads::Threads
+        version_system
 )
 
 # Suppress noisy warnings from third-party headers
