@@ -17,6 +17,18 @@ set(CMAKE_CXX_FLAGS_DEBUG   "-g -O0 -DDEBUG")
 find_package(OpenSSL REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(Threads REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(glfw3 REQUIRED)
+
+if(TARGET OpenGL::GL)
+  set(OPENGL_LIB OpenGL::GL)
+elseif(DEFINED OPENGL_gl_LIBRARY)
+  set(OPENGL_LIB ${OPENGL_gl_LIBRARY})
+elseif(DEFINED OPENGL_LIBRARY)
+  set(OPENGL_LIB ${OPENGL_LIBRARY})
+else()
+  message(FATAL_ERROR "Could not resolve OpenGL library target")
+endif()
 
 # ── Core library ─────────────────────────────────────────────────────────────
 set(NVCS_CORE_SOURCES
@@ -55,6 +67,16 @@ target_compile_options(nvcs_core PRIVATE
     -Wno-deprecated-declarations
 )
 
+# ── Server support library ───────────────────────────────────────────────────
+add_library(nvcs_server STATIC server/server.cpp)
+target_link_libraries(nvcs_server PUBLIC nvcs_core)
+target_include_directories(nvcs_server
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+)
+target_compile_options(nvcs_server PRIVATE -Wno-deprecated-declarations)
+
 # ── CLI client ───────────────────────────────────────────────────────────────
 set(NVCS_CLI_SOURCES
     cli/main.cpp
@@ -85,15 +107,49 @@ target_compile_options(nvcs PRIVATE -Wno-deprecated-declarations)
 
 # ── Server ───────────────────────────────────────────────────────────────────
 add_executable(nvcs-server server/main.cpp)
-target_link_libraries(nvcs-server PRIVATE nvcs_core)
+target_link_libraries(nvcs-server PRIVATE nvcs_server)
 target_include_directories(nvcs-server PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/third_party
 )
 target_compile_options(nvcs-server PRIVATE -Wno-deprecated-declarations)
 
+if(TARGET glfw3::glfw)
+  set(GLFW_LIB glfw3::glfw)
+elseif(TARGET glfw)
+  set(GLFW_LIB glfw)
+elseif(TARGET glfw3)
+  set(GLFW_LIB glfw3)
+else()
+  message(FATAL_ERROR "Could not find GLFW3 target")
+endif()
+
+add_executable(nvcs-server-gui gui/main.cpp)
+target_link_libraries(nvcs-server-gui PRIVATE nvcs_server ${GLFW_LIB} ${OPENGL_LIB})
+target_include_directories(nvcs-server-gui PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+)
+target_compile_options(nvcs-server-gui PRIVATE -Wno-deprecated-declarations)
+if(APPLE)
+  target_compile_definitions(nvcs-server-gui PRIVATE GL_SILENCE_DEPRECATION)
+endif()
+
+add_executable(nvcs-client-gui gui/client.cpp)
+target_link_libraries(nvcs-client-gui PRIVATE nvcs_core ${GLFW_LIB} ${OPENGL_LIB})
+target_include_directories(nvcs-client-gui PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+)
+target_compile_options(nvcs-client-gui PRIVATE -Wno-deprecated-declarations)
+if(APPLE)
+  target_compile_definitions(nvcs-client-gui PRIVATE GL_SILENCE_DEPRECATION)
+endif()
+
 # ── Install ──────────────────────────────────────────────────────────────────
-install(TARGETS nvcs nvcs-server
+install(TARGETS nvcs nvcs-server nvcs-server-gui nvcs-client-gui
     RUNTIME DESTINATION bin
 )
 
